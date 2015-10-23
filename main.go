@@ -85,4 +85,12 @@ func main () {
     }
 
 
+
+    verbs, err := getVerbs(10)
+    chk(err)
+
+    for v := 0; v < len(verbs); v++ {
+        fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
+    }
+
 }
