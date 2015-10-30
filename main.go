@@ -25,6 +25,7 @@ type Verb struct {
     Past_simpe      string `json:"past_simpe"`
     Past_participle string `json:"past_participle"`
     Translation     string `json:"translation"`
+    Active          bool `json:"active"`
 }
 
 func fatal(err error) {
@@ -93,7 +94,8 @@ func main () {
             `infinitive varchar(100) not null,` +
             `past_simpe varchar(100) not null,` +
             `past_participle varchar(100) not null,` +
-            `translation varchar(100) not null` +
+            `translation varchar(100) not null,` +
+            `active tinyint default 0`+
             `) engine=InnoDb Default charset=utf8 collate=utf8_general_ci`)
     } else {
         _, err = db.Exec("CREATE TABLE IF NOT EXISTS " +
@@ -125,7 +127,7 @@ func main () {
 
             for i := 0; i < len(recs); i++ {
                 fmt.Printf("Add new verb: %s %v\n", recs[i].Infinitive, recs[i])
-                _, err = insert(recs[i].Infinitive, recs[i].Past_simpe, recs[i].Past_participle, recs[i].Translation)
+                _, err = insert(recs[i].Infinitive, recs[i].Past_simpe, recs[i].Past_participle, recs[i].Translation, recs[i].Active)
                 chk(err)
 
             }

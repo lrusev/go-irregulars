@@ -3,103 +3,120 @@
       "infinitive":"be",
       "past_simpe":"was, were",
       "past_participle":"been",
-      "translation":"быть, являться"
+      "translation":"быть, являться",
+      "active": true
    },
    {
       "infinitive":"beat",
       "past_simpe":"beat",
       "past_participle":"beaten",
-      "translation":"бить, колотить"
+      "translation":"бить, колотить",
+      "active": true
    },
    {
       "infinitive":"become",
       "past_simpe":"became",
       "past_participle":"become",
-      "translation":"становиться"
+      "translation":"становиться",
+      "active": true
    },
    {
       "infinitive":"begin",
       "past_simpe":"began",
       "past_participle":"begun",
-      "translation":"начинать"
+      "translation":"начинать",
+      "active": true
    },
    {
       "infinitive":"bend",
       "past_simpe":"bent",
       "past_participle":"bent",
-      "translation":"гнуть"
+      "translation":"гнуть",
+      "active": true
    },
    {
       "infinitive":"bet",
       "past_simpe":"bet",
       "past_participle":"bet",
-      "translation":"держать пари"
+      "translation":"держать пари",
+      "active": true
    },
    {
       "infinitive":"bite",
       "past_simpe":"bit",
       "past_participle":"bitten",
-      "translation":"кусать"
+      "translation":"кусать",
+      "active": true
    },
    {
       "infinitive":"blow",
       "past_simpe":"blew",
       "past_participle":"blown",
-      "translation":"дуть, выдыхать"
+      "translation":"дуть, выдыхать",
+      "active": true
    },
    {
       "infinitive":"break",
       "past_simpe":"broke",
       "past_participle":"broken",
-      "translation":"ломать, разбивать, разрушать"
+      "translation":"ломать, разбивать, разрушать",
+      "active": true
    },
    {
       "infinitive":"bring",
       "past_simpe":"brought",
       "past_participle":"brought",
-      "translation":"приносить, привозить, доставлять"
+      "translation":"приносить, привозить, доставлять",
+      "active": true
    },
    {
       "infinitive":"build",
       "past_simpe":"built",
       "past_participle":"built",
-      "translation":"строить, сооружать"
+      "translation":"строить, сооружать",
+      "active": true
    },
    {
       "infinitive":"buy",
       "past_simpe":"bought",
       "past_participle":"bought",
-      "translation":"покупать, приобретать"
+      "translation":"покупать, приобретать",
+      "active": true
    },
    {
       "infinitive":"catch",
       "past_simpe":"caught",
       "past_participle":"caught",
-      "translation":"ловить, поймать, схватить"
+      "translation":"ловить, поймать, схватить",
+      "active": true
    },
    {
       "infinitive":"choose",
       "past_simpe":"chose",
       "past_participle":"chosen",
-      "translation":"выбирать, избирать"
+      "translation":"выбирать, избирать",
+      "active": true
    },
    {
       "infinitive":"come",
       "past_simpe":"came",
       "past_participle":"come",
-      "translation":"приходить, подходить"
+      "translation":"приходить, подходить",
+      "active": true
    },
    {
       "infinitive":"cost",
       "past_simpe":"cost",
       "past_participle":"cost",
-      "translation":"стоить, обходиться"
+      "translation":"стоить, обходиться",
+      "active": true
    },
    {
       "infinitive":"cut",
       "past_simpe":"cut",
       "past_participle":"cut",
-      "translation":"резать, разрезать"
+      "translation":"резать, разрезать",
+      "active": true
    },
    {
       "infinitive":"deal",
@@ -111,145 +128,169 @@
       "infinitive":"dig",
       "past_simpe":"dug",
       "past_participle":"dug",
-      "translation":"копать, рыть"
+      "translation":"копать, рыть",
+      "active": true
    },
    {
       "infinitive":"do",
       "past_simpe":"did",
       "past_participle":"done",
-      "translation":"делать, выполнять"
+      "translation":"делать, выполнять",
+      "active": true
    },
    {
       "infinitive":"draw",
       "past_simpe":"drew",
       "past_participle":"drawn",
-      "translation":"рисовать, чертить"
+      "translation":"рисовать, чертить",
+      "active": true
    },
    {
       "infinitive":"drink",
       "past_simpe":"drank",
       "past_participle":"drunk",
-      "translation":"пить"
+      "translation":"пить",
+      "active": true
    },
    {
       "infinitive":"drive",
       "past_simpe":"drove",
       "past_participle":"driven",
-      "translation":"ездить, подвозить"
+      "translation":"ездить, подвозить",
+      "active": true
    },
    {
       "infinitive":"eat",
       "past_simpe":"ate",
       "past_participle":"eaten",
-      "translation":"есть, поглощать, поедать"
+      "translation":"есть, поглощать, поедать",
+      "active": true
    },
    {
       "infinitive":"fall",
       "past_simpe":"fell",
       "past_participle":"fallen",
-      "translation":"падать"
+      "translation":"падать",
+      "active": true
    },
    {
       "infinitive":"feed",
       "past_simpe":"fed",
       "past_participle":"fed",
-      "translation":"кормить"
+      "translation":"кормить",
+      "active": true
    },
    {
       "infinitive":"feel",
       "past_simpe":"felt",
       "past_participle":"felt",
-      "translation":"чувствовать, ощущать"
+      "translation":"чувствовать, ощущать",
+      "active": true
    },
    {
       "infinitive":"fight",
       "past_simpe":"fought",
       "past_participle":"fought",
-      "translation":"драться, сражаться, воевать"
+      "translation":"драться, сражаться, воевать",
+      "active": true
    },
    {
       "infinitive":"find",
       "past_simpe":"found",
       "past_participle":"found",
-      "translation":"находить, обнаруживать"
+      "translation":"находить, обнаруживать",
+      "active": true
    },
    {
       "infinitive":"fly",
       "past_simpe":"flew",
       "past_participle":"flown",
-      "translation":"летать"
+      "translation":"летать",
+      "active": true
    },
    {
       "infinitive":"forget",
       "past_simpe":"forgot",
       "past_participle":"forgotten",
-      "translation":"забывать о (чём-либо)"
+      "translation":"забывать о (чём-либо)",
+      "active": true
    },
    {
       "infinitive":"forgive",
       "past_simpe":"forgave",
       "past_participle":"forgiven",
-      "translation":"прощать"
+      "translation":"прощать",
+      "active": true
    },
    {
       "infinitive":"freeze",
       "past_simpe":"froze",
       "past_participle":"frozen",
-      "translation":"замерзать, замирать"
+      "translation":"замерзать, замирать",
+      "active": true
    },
    {
       "infinitive":"get",
       "past_simpe":"got",
       "past_participle":"got",
-      "translation":"получать, добираться"
+      "translation":"получать, добираться",
+      "active": true
    },
    {
       "infinitive":"give",
       "past_simpe":"gave",
       "past_participle":"given",
-      "translation":"дать, подать, дарить"
+      "translation":"дать, подать, дарить",
+      "active": true
    },
    {
       "infinitive":"go",
       "past_simpe":"went",
       "past_participle":"gone",
-      "translation":"идти, двигаться"
+      "translation":"идти, двигаться",
+      "active": true
    },
    {
       "infinitive":"grow",
       "past_simpe":"grew",
       "past_participle":"grown",
-      "translation":"расти, вырастать"
+      "translation":"расти, вырастать",
+      "active": true
    },
    {
       "infinitive":"hang",
       "past_simpe":"hung",
       "past_participle":"hung",
-      "translation":"вешать, развешивать, висеть"
+      "translation":"вешать, развешивать, висеть",
+      "active": true
    },
    {
       "infinitive":"have",
       "past_simpe":"had",
       "past_participle":"had",
-      "translation":"иметь, обладать"
+      "translation":"иметь, обладать",
+      "active": true
    },
    {
       "infinitive":"hear",
       "past_simpe":"heard",
       "past_participle":"heard",
-      "translation":"слышать, услышать"
+      "translation":"слышать, услышать",
+      "active": true
    },
    {
       "infinitive":"hide",
       "past_simpe":"hid",
       "past_participle":"hidden",
-      "translation":"прятать, скрывать"
+      "translation":"прятать, скрывать",
+      "active": true
    },
    {
       "infinitive":"hit",
       "past_simpe":"hit",
       "past_participle":"hit",
-      "translation":"ударять, поражать"
+      "translation":"ударять, поражать",
+      "active": true
    },
    {
       "infinitive":"hold",
