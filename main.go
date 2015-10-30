@@ -12,6 +12,7 @@ import (
     "encoding/json"
     "io/ioutil"
     "gopkg.in/readline.v1"
+    "github.com/ttacon/chalk"
 )
 
 const myconf string = ".myverbs"
@@ -121,7 +122,7 @@ func main () {
         }
     }
 
-    
+
     count := 10
 
 
@@ -144,6 +145,16 @@ func main () {
     var valid string
     correct, incorrect := 0, 0
 
+    lime := chalk.Green.NewStyle().
+    WithBackground(chalk.Black).
+    WithTextStyle(chalk.Bold).
+    Style
+
+    red := chalk.Red.NewStyle().
+    WithBackground(chalk.Black).
+    WithTextStyle(chalk.Bold).
+    Style
+
     for v := 0; v < len(verbs); v++ {
         fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
         line, err := rl.Readline()
@@ -154,13 +165,14 @@ func main () {
         valid = fmt.Sprintf("%s %s %s", verbs[v].Infinitive, verbs[v].Past_simpe, verbs[v].Past_participle)
         if line == valid {
             correct +=1
-            println("valid")
+            fmt.Println(lime("valid"+"   \u2713"))
         } else {
             incorrect+=1
-            println("invalid(", valid, ")")
+            fmt.Println(red("invalid(" + valid + ")"))
         }
     }
 
-    println(fmt.Sprintf("Correct: %d", correct))
-    println(fmt.Sprintf("In-correct: %d", incorrect))
+    fmt.Println(lime("----------------------------"))
+    fmt.Println(lime(fmt.Sprintf("Correct: %d", correct)))
+    fmt.Println(red(fmt.Sprintf("In-correct: %d", incorrect)))
 }
