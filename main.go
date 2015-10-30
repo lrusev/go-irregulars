@@ -13,6 +13,7 @@ import (
     "io/ioutil"
     "gopkg.in/readline.v1"
     "github.com/ttacon/chalk"
+    "github.com/spf13/cobra"
 )
 
 const myconf string = ".myverbs"
@@ -79,6 +80,8 @@ var driver string
 
 func main () {
     var err error
+    var count int
+    var from string
 
     db, err = connect()
     fatal(err)
@@ -103,76 +106,94 @@ func main () {
     }
 
     fatal(err)
-    total:= getTotalVerbs();
-    file, err := ioutil.ReadFile("./fixtures/irregulars.json")
-    chk(err)
 
-    // fmt.Printf("%s\n", string(file))
-
-    var recs []Verb
-    err = json.Unmarshal([]byte(file), &recs)
-    chk(err)
-
-    if len(recs) > total {
-        for i := 0; i < len(recs); i++ {
-            fmt.Printf("Add new verb: %s %v\n", recs[i].Infinitive, recs[i])
-            _, err = insert(recs[i].Infinitive, recs[i].Past_simpe, recs[i].Past_participle, recs[i].Translation)
+    var cmdLoad = &cobra.Command{
+        Use:   "load",
+        Short: "Load verbs from file",
+        Run: func(cmd *cobra.Command, args []string) {
+            // total:= getTotalVerbs();
+            file, err := ioutil.ReadFile(from)
             chk(err)
 
-        }
+
+            var recs []Verb
+            err = json.Unmarshal([]byte(file), &recs)
+            chk(err)
+
+            _, err = db.Exec("DELETE FROM verbs")
+            chk(err)
+
+            for i := 0; i < len(recs); i++ {
+                fmt.Printf("Add new verb: %s %v\n", recs[i].Infinitive, recs[i])
+                _, err = insert(recs[i].Infinitive, recs[i].Past_simpe, recs[i].Past_participle, recs[i].Translation)
+                chk(err)
+
+            }
+        },
     }
 
+    cmdLoad.Flags().StringVarP(&from, "from", "f", "./fixtures/irregulars.json", "Load from file")
 
-    count := 10
+    var cmdPlay = &cobra.Command{
+        Use:   "play",
+        Short: "Check verbs",
+        Run: func(cmd *cobra.Command, args []string) {
+            verbs, err := getVerbs(count)
+            chk(err)
 
+            if len(verbs) == 0 {
+                fmt.Println("There no verbs to learn")
+                os.Exit(1)
+            }
 
-    verbs, err := getVerbs(count)
-    chk(err)
+            fmt.Printf("Start with %d words...\n", count)
 
-    fmt.Printf("Start with %d words...\n", count)
+            rl, err := readline.New("> ")
+            if err != nil {
+                panic(err)
+            }
 
-    /*for v := 0; v < len(verbs); v++ {
-        fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
-    }*/
+            defer rl.Close()
 
-    rl, err := readline.New("> ")
-    if err != nil {
-        panic(err)
+            var valid string
+            correct, incorrect := 0, 0
+
+            lime := chalk.Green.NewStyle().
+            WithBackground(chalk.Black).
+            WithTextStyle(chalk.Bold).
+            Style
+
+            red := chalk.Red.NewStyle().
+            WithBackground(chalk.Black).
+            WithTextStyle(chalk.Bold).
+            Style
+
+            for v := 0; v < len(verbs); v++ {
+                fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
+                line, err := rl.Readline()
+                if err != nil { // io.EOF
+                    break
+                }
+
+                valid = fmt.Sprintf("%s %s %s", verbs[v].Infinitive, verbs[v].Past_simpe, verbs[v].Past_participle)
+                if line == valid {
+                    correct +=1
+                    fmt.Println(lime("\u2713"+" valid"))
+                } else {
+                    incorrect+=1
+                    fmt.Println(red("invalid(" + valid + ")"))
+                }
+            }
+
+            fmt.Println(lime("----------------------------"))
+            fmt.Println(lime(fmt.Sprintf("Correct: %d", correct)))
+            fmt.Println(red(fmt.Sprintf("In-correct: %d", incorrect)))
+        },
     }
 
-    defer rl.Close()
+    cmdPlay.Flags().IntVarP(&count, "count", "c", 10, "Verbs to check")
 
-    var valid string
-    correct, incorrect := 0, 0
-
-    lime := chalk.Green.NewStyle().
-    WithBackground(chalk.Black).
-    WithTextStyle(chalk.Bold).
-    Style
-
-    red := chalk.Red.NewStyle().
-    WithBackground(chalk.Black).
-    WithTextStyle(chalk.Bold).
-    Style
-
-    for v := 0; v < len(verbs); v++ {
-        fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
-        line, err := rl.Readline()
-        if err != nil { // io.EOF
-            break
-        }
-
-        valid = fmt.Sprintf("%s %s %s", verbs[v].Infinitive, verbs[v].Past_simpe, verbs[v].Past_participle)
-        if line == valid {
-            correct +=1
-            fmt.Println(lime("valid"+"   \u2713"))
-        } else {
-            incorrect+=1
-            fmt.Println(red("invalid(" + valid + ")"))
-        }
-    }
-
-    fmt.Println(lime("----------------------------"))
-    fmt.Println(lime(fmt.Sprintf("Correct: %d", correct)))
-    fmt.Println(red(fmt.Sprintf("In-correct: %d", incorrect)))
+    var rootCmd = &cobra.Command{Use: "app"}
+    rootCmd.AddCommand(cmdPlay, cmdLoad)
+    rootCmd.Execute()
 }
