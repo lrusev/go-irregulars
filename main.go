@@ -113,7 +113,6 @@ func main () {
         Use:   "load",
         Short: "Load verbs from file",
         Run: func(cmd *cobra.Command, args []string) {
-            // total:= getTotalVerbs();
             file, err := ioutil.ReadFile(from)
             chk(err)
 
@@ -136,19 +135,27 @@ func main () {
 
     cmdLoad.Flags().StringVarP(&from, "from", "f", "./fixtures/irregulars.json", "Load from file")
 
-    var cmdPlay = &cobra.Command{
-        Use:   "play",
+    var cmdCheck = &cobra.Command{
+        Use:   "check",
         Short: "Check verbs",
         Run: func(cmd *cobra.Command, args []string) {
+            all, err := cmd.Flags().GetBool("all")
+            chk(err)
+
+            if all == true {
+                count = getTotalVerbs(true);
+            }
+
             verbs, err := getVerbs(count)
             chk(err)
+
 
             if len(verbs) == 0 {
                 fmt.Println("There no verbs to learn")
                 os.Exit(1)
             }
 
-            fmt.Printf("Start with %d words...\n", count)
+            fmt.Printf("Start with %d words...\n", len(verbs))
 
             rl, err := readline.New("> ")
             if err != nil {
@@ -187,15 +194,34 @@ func main () {
                 }
             }
 
+            percent := int(float64(correct)/float64(len(verbs))* 100)
+            status := "You can do better!"
+
+            switch {
+            case percent == 100:
+                status = "Excelent!"
+            case percent > 85:
+                status = "Good!"
+            case percent >= 75:
+                status = "Not bad!"
+            }
+
             fmt.Println(lime("----------------------------"))
-            fmt.Println(lime(fmt.Sprintf("Correct: %d", correct)))
-            fmt.Println(red(fmt.Sprintf("In-correct: %d", incorrect)))
+            fmt.Print(lime(fmt.Sprintf("%s | Correct: %d", status, correct)))
+
+            if incorrect > 0 {
+                fmt.Print(lime(" | "), red(fmt.Sprintf("Fails: %d", incorrect)))
+            }
+
+            fmt.Println()
         },
     }
 
-    cmdPlay.Flags().IntVarP(&count, "count", "c", 10, "Verbs to check")
+    cmdCheck.Flags().IntVarP(&count, "count", "c", 10, "Verbs to check")
+    cmdCheck.Flags().Bool("all", false, "Specify to check all verbs")
+    cmdCheck.Flags().Lookup("all").NoOptDefVal = "true"
 
     var rootCmd = &cobra.Command{Use: "app"}
-    rootCmd.AddCommand(cmdPlay, cmdLoad)
+    rootCmd.AddCommand(cmdCheck, cmdLoad)
     rootCmd.Execute()
 }

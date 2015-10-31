@@ -7,12 +7,15 @@ import (
 func getVerbs(count int) ([]Verb, error) {
     var rows *sql.Rows
     var err error
-    
+
+    union := "(SELECT * FROM verbs WHERE active=1 ORDER BY id desc LIMIT 5) UNION "
+
     if driver == "mysql" {
-        rows, err = db.Query("SELECT * FROM verbs WHERE active=1 ORDER BY RAND() LIMIT ?", count)
+        rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 LIMIT ?) ORDER BY RAND()", count-5)
     } else {
-        rows, err = db.Query("SELECT * FROM verbs WHERE active=1 ORDER BY RANDOM() LIMIT $1", count)
+        rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 LIMIT $1) ORDER BY RANDOM()", count-5)
     }
+
     if err != nil {
         return nil, err
     }
@@ -36,10 +39,15 @@ func getVerbs(count int) ([]Verb, error) {
     return rs, nil
 }
 
-func getTotalVerbs() (int) {
+func getTotalVerbs(activeOnly bool) (int) {
     var total int
-    err := db.QueryRow("SELECT count(*) FROM verbs").Scan(&total)
-    chk(err)
+    if activeOnly {
+            err := db.QueryRow("SELECT count(*) FROM verbs WHERE active=1").Scan(&total)
+            chk(err)
+        } else {
+            err := db.QueryRow("SELECT count(*) FROM verbs").Scan(&total)
+            chk(err)
+        }
 
     return total
 }
