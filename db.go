@@ -4,17 +4,27 @@ import (
     "database/sql"
 )
 
-func getVerbs(count int) ([]Verb, error) {
+func getVerbs(count int, disabled bool) ([]Verb, error) {
     var rows *sql.Rows
     var err error
 
-    union := "(SELECT * FROM verbs WHERE active=1 ORDER BY id desc LIMIT 5) UNION "
+    if !disabled {
+        union := "(SELECT * FROM verbs WHERE active=1 ORDER BY infinitive desc LIMIT 5) UNION "
 
-    if driver == "mysql" {
-        rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 LIMIT ?) ORDER BY RAND()", count-5)
+        if driver == "mysql" {
+            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT ?) ORDER BY RAND()", count-5)
+        } else {
+            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT $1) ORDER BY RANDOM()", count-5)
+        }
+
     } else {
-        rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 LIMIT $1) ORDER BY RANDOM()", count-5)
+        if driver == "mysql" {
+            rows, err = db.Query("SELECT * FROM verbs WHERE active=0 ORDER BY infinitive LIMIT ?", count)
+        } else {
+            rows, err = db.Query("SELECT * FROM verbs WHERE active=0 ORDER BY infinitive LIMIT $1", count)
+        }
     }
+
 
     if err != nil {
         return nil, err
@@ -25,7 +35,7 @@ func getVerbs(count int) ([]Verb, error) {
     var rs = make([]Verb, 0)
     var rec Verb
     for rows.Next() {
-        if err = rows.Scan(&rec.Id, &rec.Infinitive, &rec.Past_simpe, &rec.Past_participle, &rec.Translation, &rec.Active); err != nil {
+        if err = rows.Scan(&rec.Id, &rec.Infinitive, &rec.Past_simpe, &rec.Past_participle, &rec.Translation, &rec.Active, &rec.Progress); err != nil {
             return nil, err
         }
 
@@ -52,11 +62,27 @@ func getTotalVerbs(activeOnly bool) (int) {
     return total
 }
 
-func insert(inf, simple, participle, trans string, active bool) (sql.Result, error) {
+func insert(verb Verb) (sql.Result, error) {
     if driver == "mysql" {
-        return db.Exec("INSERT INTO verbs VALUES (null, ?, ?, ?, ?, ?)", inf, simple, participle, trans, active)
+        return db.Exec("INSERT INTO verbs VALUES (null, ?, ?, ?, ?, ?, ?)", verb.Infinitive, verb.Past_simpe, verb.Past_participle, verb.Translation, verb.Active, verb.Progress)
     } else {
-        return db.Exec("INSERT INTO verbs VALUES (default, $1, $2, $3, $4, $5)", inf, simple, participle, trans, active)
+        return db.Exec("INSERT INTO verbs VALUES (default, $1, $2, $3, $4, $5, $6)", verb.Infinitive, verb.Past_simpe, verb.Past_participle, verb.Translation, verb.Active, verb.Progress)
+    }
+}
+
+func progress(verb Verb, val int) (sql.Result, error) {
+    if driver == "mysql" {
+            return db.Exec("UPDATE verbs SET progress = progress + ? WHERE id = ?", val, verb.Id)
+        } else {
+            return db.Exec("UPDATE verbs SET progress = progress + $1 WHERE id = $2", val, verb.Id)
+        }
+}
+
+func update(verb Verb) (sql.Result, error) {
+     if driver == "mysql" {
+        return db.Exec("UPDATE verbs SET infinitive = ?, past_simpe = ?, past_participle = ?, active = ?, progress = ?, translation = ?  WHERE id = ?", verb.Infinitive, verb.Past_simpe, verb.Past_participle, verb.Active, verb.Progress, verb.Translation, verb.Id)
+    } else {
+        return db.Exec("UPDATE verbs SET infinitive = $1, past_simpe = $2, past_participle = $3, active = $4, progress = $5, translation = $6  WHERE id = $", verb.Infinitive, verb.Past_simpe, verb.Past_participle, verb.Active, verb.Progress, verb.Translation, verb.Id)
     }
 }
 

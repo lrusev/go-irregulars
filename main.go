@@ -14,6 +14,7 @@ import (
     "gopkg.in/readline.v1"
     "github.com/ttacon/chalk"
     "github.com/spf13/cobra"
+    "strings"
 )
 
 const myconf string = ".myverbs"
@@ -26,6 +27,7 @@ type Verb struct {
     Past_participle string `json:"past_participle"`
     Translation     string `json:"translation"`
     Active          bool `json:"active"`
+    Progress        int `json:"progress"`
 }
 
 func fatal(err error) {
@@ -76,6 +78,13 @@ func connect() (*sql.DB, error) {
     return sql.Open(driver, info)
 }
 
+func rightPad(s string, padStr string, overallLen int) string{
+    var padCountInt int
+    padCountInt = 1 + ((overallLen-len(padStr))/len(padStr))
+    var retStr =  s + strings.Repeat(padStr, padCountInt)
+    return retStr[:overallLen]
+}
+
 var db *sql.DB
 var driver string
 
@@ -95,7 +104,8 @@ func main () {
             `past_simpe varchar(100) not null,` +
             `past_participle varchar(100) not null,` +
             `translation varchar(100) not null,` +
-            `active tinyint default 0`+
+            `active tinyint default 0,`+
+            `progress int(11) default 0` +
             `) engine=InnoDb Default charset=utf8 collate=utf8_general_ci`)
     } else {
         _, err = db.Exec("CREATE TABLE IF NOT EXISTS " +
@@ -108,6 +118,21 @@ func main () {
     }
 
     fatal(err)
+
+    lime := chalk.Green.NewStyle().
+            WithBackground(chalk.Black).
+            WithTextStyle(chalk.Bold).
+            Style
+
+    red := chalk.Red.NewStyle().
+            WithBackground(chalk.Black).
+            WithTextStyle(chalk.Bold).
+            Style
+
+    yellow := chalk.Yellow.NewStyle().
+            WithBackground(chalk.Black).
+            WithTextStyle(chalk.Bold).
+            Style
 
     var cmdLoad = &cobra.Command{
         Use:   "load",
@@ -126,7 +151,7 @@ func main () {
 
             for i := 0; i < len(recs); i++ {
                 fmt.Printf("Add new verb: %s %v\n", recs[i].Infinitive, recs[i])
-                _, err = insert(recs[i].Infinitive, recs[i].Past_simpe, recs[i].Past_participle, recs[i].Translation, recs[i].Active)
+                _, err = insert(recs[i])
                 chk(err)
 
             }
@@ -134,6 +159,72 @@ func main () {
     }
 
     cmdLoad.Flags().StringVarP(&from, "from", "f", "./fixtures/irregulars.json", "Load from file")
+
+    var cmdLearn = &cobra.Command{
+        Use: "learn",
+        Short: "Learn new words",
+        Run: func(cmd *cobra.Command, args []string) {
+            count, err := cmd.Flags().GetInt("count")
+            chk(err)
+
+            all, err := cmd.Flags().GetBool("all")
+            chk(err)
+
+            if all == true {
+                err := db.QueryRow("SELECT count(*) FROM verbs WHERE active=0").Scan(&count)
+                chk(err)
+            }
+
+            verbs, err := getVerbs(count, true)
+            chk(err)
+
+            if len(verbs) == 0 {
+                fmt.Println("There no verbs to learn")
+                os.Exit(0)
+            }
+
+            var verb Verb
+
+            rl, err := readline.New("Remember(y/n) [y]?")
+            chk(err)
+
+            defer rl.Close()
+
+            im, ps, pp := 0, 0, 0
+
+            for m:= 0; m < len(verbs); m++ {
+                verb = verbs[m]
+                if len(verb.Infinitive) > im {
+                    im = len(verb.Infinitive)
+                }
+
+                if len(verb.Past_simpe) > ps {
+                    ps = len(verb.Past_simpe)
+                }
+
+                if len(verb.Past_participle) > pp {
+                    pp = len(verb.Past_participle)
+                }
+            }
+
+            for v:=0; v < len(verbs); v++ {
+                verb = verbs[v]
+                fmt.Println(yellow(rightPad(verb.Infinitive, " ", im)), lime(" | "), yellow(rightPad(verb.Past_simpe, " ", ps)), lime(" | "), yellow(rightPad(verb.Past_participle, " ", pp)),  lime(" | -> [" + verb.Translation + "]"))
+                line, err := rl.Readline()
+                if err != nil { // io.EOF
+                    break
+                }
+
+                if line == "" || strings.ToLower(line) == "y" {
+                    verb.Active = true;
+                    update(verb)
+                }
+            }
+        },
+    }
+
+    cmdLearn.Flags().Int("count", 5, "Verbs to learn")
+    cmdLearn.Flags().Bool("all", false, "Specify to check all verbs")
 
     var cmdCheck = &cobra.Command{
         Use:   "check",
@@ -146,39 +237,27 @@ func main () {
                 count = getTotalVerbs(true);
             }
 
-            verbs, err := getVerbs(count)
+            verbs, err := getVerbs(count, false)
             chk(err)
 
 
             if len(verbs) == 0 {
-                fmt.Println("There no verbs to learn")
+                fmt.Println("There no verbs to check")
                 os.Exit(1)
             }
 
             fmt.Printf("Start with %d words...\n", len(verbs))
 
             rl, err := readline.New("> ")
-            if err != nil {
-                panic(err)
-            }
+            chk(err)
 
             defer rl.Close()
 
             var valid string
             correct, incorrect := 0, 0
 
-            lime := chalk.Green.NewStyle().
-            WithBackground(chalk.Black).
-            WithTextStyle(chalk.Bold).
-            Style
-
-            red := chalk.Red.NewStyle().
-            WithBackground(chalk.Black).
-            WithTextStyle(chalk.Bold).
-            Style
-
             for v := 0; v < len(verbs); v++ {
-                fmt.Printf("%d) %s\n", v+1, verbs[v].Translation)
+                fmt.Printf("%d) %s\n", v+1, yellow(verbs[v].Translation))
                 line, err := rl.Readline()
                 if err != nil { // io.EOF
                     break
@@ -187,8 +266,18 @@ func main () {
                 valid = fmt.Sprintf("%s %s %s", verbs[v].Infinitive, verbs[v].Past_simpe, verbs[v].Past_participle)
                 if line == valid {
                     correct +=1
+                    if verbs[v].Progress < 10 {
+                        _, err = progress(verbs[v], 1)
+                        chk(err)
+                    }
+
                     fmt.Println(lime("\u2713"+" valid"))
                 } else {
+                    if verbs[v].Progress > 0 {
+                        _, err = progress(verbs[v], -1)
+                        chk(err)
+                    }
+
                     incorrect+=1
                     fmt.Println(red("invalid(" + valid + ")"))
                 }
@@ -222,6 +311,6 @@ func main () {
     cmdCheck.Flags().Lookup("all").NoOptDefVal = "true"
 
     var rootCmd = &cobra.Command{Use: "app"}
-    rootCmd.AddCommand(cmdCheck, cmdLoad)
+    rootCmd.AddCommand(cmdCheck, cmdLoad, cmdLearn)
     rootCmd.Execute()
 }
