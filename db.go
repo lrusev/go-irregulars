@@ -2,19 +2,20 @@ package main
 
 import (
     "database/sql"
+    "strconv"
 )
 
-func getVerbs(count int, disabled bool) ([]Verb, error) {
+func getVerbs(count, recall int, disabled bool) ([]Verb, error) {
     var rows *sql.Rows
     var err error
 
     if !disabled {
-        union := "(SELECT * FROM verbs WHERE active=1 ORDER BY infinitive desc LIMIT 5) UNION "
+        union := "(SELECT * FROM verbs WHERE active=1 ORDER BY infinitive desc, progress asc LIMIT " + strconv.Itoa(recall) + ") UNION "
 
         if driver == "mysql" {
-            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT ?) ORDER BY RAND()", count-5)
+            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT ?) ORDER BY RAND()", count - recall)
         } else {
-            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT $1) ORDER BY RANDOM()", count-5)
+            rows, err = db.Query(union + "(SELECT * FROM verbs WHERE active=1 ORDER BY progress LIMIT $1) ORDER BY RANDOM()", count  - recall)
         }
 
     } else {

@@ -340,6 +340,12 @@
       "translation":"хранить, сохранять, поддерживать"
    },
    {
+      "infinitive":"kneel",
+      "past_simpe":"knelt",
+      "past_participle":"knelt",
+      "translation": "становиться на колени"
+   },
+   {
       "infinitive":"know",
       "past_simpe":"knew",
       "past_participle":"known",
@@ -356,6 +362,12 @@
       "past_simpe":"led",
       "past_participle":"led",
       "translation":"вести за собой, сопровождать, руководить"
+   },
+   {
+      "infinitive":"learn",
+      "past_simpe":"learned/learnt",
+      "past_participle":"learned/learnt",
+      "translation":"учиться, изучать"
    },
    {
       "infinitive":"leave",

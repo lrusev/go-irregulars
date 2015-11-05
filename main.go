@@ -175,7 +175,7 @@ func main () {
                 chk(err)
             }
 
-            verbs, err := getVerbs(count, true)
+            verbs, err := getVerbs(count, 5, true)
             chk(err)
 
             if len(verbs) == 0 {
@@ -233,11 +233,14 @@ func main () {
             all, err := cmd.Flags().GetBool("all")
             chk(err)
 
+            recall, err := cmd.Flags().GetInt("recall")
+            chk(err)
+
             if all == true {
                 count = getTotalVerbs(true);
             }
 
-            verbs, err := getVerbs(count, false)
+            verbs, err := getVerbs(count, recall, false)
             chk(err)
 
 
@@ -306,6 +309,7 @@ func main () {
         },
     }
 
+    cmdCheck.Flags().Int("recall", 5, "Verbs to recall from the end of list")
     cmdCheck.Flags().IntVarP(&count, "count", "c", 10, "Verbs to check")
     cmdCheck.Flags().Bool("all", false, "Specify to check all verbs")
     cmdCheck.Flags().Lookup("all").NoOptDefVal = "true"
