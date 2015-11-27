@@ -298,8 +298,10 @@ func main () {
                 status = "Not bad!"
             }
 
+            score:= (float32(correct) / float32(correct + incorrect)) * 100;
+
             fmt.Println(lime("----------------------------"))
-            fmt.Print(lime(fmt.Sprintf("%s | Correct: %d", status, correct)))
+            fmt.Print(lime(fmt.Sprintf("%s | Correct: %d | score: %%%.1f", status, correct, score)))
 
             if incorrect > 0 {
                 fmt.Print(lime(" | "), red(fmt.Sprintf("Fails: %d", incorrect)))
